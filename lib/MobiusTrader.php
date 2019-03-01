@@ -24,11 +24,13 @@ class MobiusTrader
 
     const SESSION_TYPE = 0;
 
+    private $_config;
     private $_client;
     private $_cache;
 
     public function __construct($config = array())
     {
+        $this->_config = $config;
         $this->_cache = new MobiusTrader_Cache($config);
         $this->_client = new MobiusTrader_Client($config);
     }
@@ -345,6 +347,26 @@ class MobiusTrader
         ));
     }
 
+    public function trader_auth($login, $password, $ip, $agent)
+    {
+        $terminal_url = $this->_config['terminal_url'];
+
+        $response = $this->post($terminal_url . '/get-jwt', array(
+            'login' => $login,
+            'password' => $password,
+            'ip' => $ip,
+            'agent' => $agent,
+        ));
+
+        return !empty($response['error']) ? array(
+            'status' => MobiusTrader::STATUS_ERROR,
+            'data' => $response['error'],
+        ) : array(
+            'status' => MobiusTrader::STATUS_OK,
+            'data' => $response['jwt'],
+        );
+    }
+
     public function search($columns = NULL)
     {
         return new MobiusTrader_Search($this->_client, func_get_args());
@@ -363,5 +385,23 @@ class MobiusTrader
     public static function from_orders()
     {
         return 'Orders';
+    }
+
+    private function post($url, $data = array())
+    {
+        $json_data = json_encode($data);
+
+        $opts = array('http' =>
+            array(
+                'method' => 'POST',
+                'header' => "Content-type: application/json\r\nContent-Length:" . strlen($json_data) . "\r\n",
+                'content' => $json_data
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $content = file_get_contents($url, false, $context);
+
+        return json_decode($content, true);
     }
 }
