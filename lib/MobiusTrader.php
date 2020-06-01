@@ -347,24 +347,13 @@ class MobiusTrader
         ));
     }
 
-    public function trader_auth($login, $password, $ip, $agent)
+    public function getJWT($account_id, $ip, $user_agent)
     {
-        $terminal_url = $this->_config['terminal_url'];
-
-        $response = $this->post($terminal_url . '/get-jwt', array(
-            'login' => $login,
-            'password' => $password,
-            'ip' => $ip,
-            'agent' => $agent,
+        return $this->_client->call('GetJWT', array(
+            'AccountId' => $account_id,
+            'IP' => $ip,
+            'UserAgent' => $user_agent,
         ));
-
-        return !empty($response['error']) ? array(
-            'status' => MobiusTrader::STATUS_ERROR,
-            'data' => $response['error'],
-        ) : array(
-            'status' => MobiusTrader::STATUS_OK,
-            'data' => $response['jwt'],
-        );
     }
 
     public function search($columns = NULL)

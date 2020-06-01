@@ -7,5 +7,4 @@ $config = array(
     'cache_enabled' => true,
     'cache_path' => '/tmp/mt7.cache',
     'cache_lifetime' => 60 * 1,
-    'terminal_url' => 'https://mt7.example.com'
 );
