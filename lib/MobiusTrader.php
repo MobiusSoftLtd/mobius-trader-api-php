@@ -347,12 +347,22 @@ class MobiusTrader
         ));
     }
 
-    public function getJWT($account_id, $ip, $user_agent)
+    public function get_jwt($account_id, $ip, $user_agent)
     {
         return $this->_client->call('GetJWT', array(
             'AccountId' => $account_id,
             'IP' => $ip,
             'UserAgent' => $user_agent,
+        ));
+    }
+
+    public function trader_auth($login, $password, $ip, $user_gent) 
+    {
+        return $this->_client->call('ApiTraderAuth', array(
+          'Login' => $login,
+          'Password' => $password,
+          'IP' => $ip,
+          'UserAgent' => $user_gent,
         ));
     }
 
