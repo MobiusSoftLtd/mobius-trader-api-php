@@ -386,6 +386,16 @@ class MobiusTrader
         return 'Orders';
     }
 
+    public static function from_accounts()
+    {
+        return 'Accounts';
+    }
+
+    public static function from_account_numbers()
+    {
+        return 'AccountNumbers';
+    }
+
     private function post($url, $data = array())
     {
         $json_data = json_encode($data);
