@@ -366,6 +366,10 @@ class MobiusTrader
         ));
     }
 
+    public function call($method, array $params = NULL) {
+        return $this->_client->call($method, $params);
+    }
+
     public function search($columns = NULL)
     {
         return new MobiusTrader_Search($this->_client, func_get_args());
