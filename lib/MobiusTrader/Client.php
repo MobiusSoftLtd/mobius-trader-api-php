@@ -31,7 +31,7 @@ class MobiusTrader_Client
 
     public function call($method, array $params = NULL)
     {
-        $url = $this->options['url'];
+        $url = str_replace('https', 'http', $this->options['url']);
         $payload = new stdClass;
 
         $payload->jsonrpc = '2.0';
@@ -71,7 +71,13 @@ class MobiusTrader_Client
 
         if (!empty($response['error']) || $status !== 200) {
             $status = self::STATUS_ERROR;
-            $data = empty($response['error']['error']['Key']) ? 'Unknown error' : $response['error']['error']['Key'];
+            if (!empty($response['error']['error']['Key'])) {
+                $data = $response['error']['error']['Key'];
+            } else if (!empty($response['error']['error'])) {
+                $data = $response['error']['error'];
+            } else {
+                $data = 'Unknown error';
+            }
         } else {
             $status = self::STATUS_OK;
             $data = $response['result'];
