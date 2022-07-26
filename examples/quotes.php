@@ -5,6 +5,10 @@ require_once './config.php';
 
 $mt7 = new MobiusTrader($config);
 
-$quotes = $mt7->get_quotes(array('BTCUSD', 'EURUSD'));
+$symbols = array('BTCUSD', 'EURUSD');
+
+$quotes = $mt7->call('SymbolQuotesGet', array(
+    'Symbols' => $symbols
+));
 
 die(var_dump($quotes));

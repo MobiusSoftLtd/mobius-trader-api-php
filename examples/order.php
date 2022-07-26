@@ -8,12 +8,12 @@ $mt7 = new MobiusTrader($config);
 $account_number_id = 1;
 $symbol_id = 1;
 
-$response = $mt7->order_open(
-    $account_number_id,
-    $symbol_id,
-    $mt7->volume_to_int($symbol_id, 0.001),
-    MobiusTrader::ORDER_CMD_SELL
-);
+$response = $mt7->call('AdminOpenOrder', array(
+    'AccountNumberId' => $account_number_id,
+    'SymbolId' => $symbol_id,
+    'Volume' => $mt7->volume_to_int($symbol_id, 0.001),
+    'TradeCmd' => MobiusTrader::ORDER_CMD_SELL,
+));
 
 if ($response['status'] === MobiusTrader::STATUS_OK) {
     $order = $response['data'];

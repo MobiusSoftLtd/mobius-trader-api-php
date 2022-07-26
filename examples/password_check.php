@@ -8,7 +8,13 @@ $mt7 = new MobiusTrader($config);
 $email = 'test@mobius-soft.org';
 $password = 'aaa111';
 
-if ($mt7->password_check($email, $password)) 
+$result = $mt7->call('PasswordCheck', array(
+    'Login' => $email,
+    'Password' => $password,
+    'SessionType' => MobiusTrader::SESSION_TYPE_TRADER,
+));
+
+if ($result['status'] == MobiusTrader::STATUS_OK && $result['data'] == true) 
 {
     echo 'Right';
 } 

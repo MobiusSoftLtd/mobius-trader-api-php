@@ -22,7 +22,8 @@ class MobiusTrader
     const ACCOUNT_NUMBER_TYPE_REAL = 1;
     const ACCOUNT_NUMBER_TYPE_DEMO = 2;
 
-    const SESSION_TYPE = 0;
+    const SESSION_TYPE_TRADER = 0;
+    const SESSION_TYPE_WITHDRAW = 4;
 
     private $_config;
     private $_client;
@@ -108,15 +109,20 @@ class MobiusTrader
         return $key ? $currencies[$key] : null;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function get_quotes(array $symbols)
     {
         $result = $this->_client->call('SymbolQuotesGet', array(
             'Symbols' => $symbols
-
         ));
         return $result['data'];
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function get_account($account_id)
     {
         return $this->_client->call('AccountGet', array(
@@ -124,6 +130,9 @@ class MobiusTrader
         ));
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function get_account_number($account_number_id)
     {
         return $this->_client->call('AccountNumberGet', array(
@@ -131,6 +140,9 @@ class MobiusTrader
         ));
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function get_account_numbers($account_id)
     {
         $result = $this->_client->call('AccountNumbersGet', array(
@@ -159,6 +171,9 @@ class MobiusTrader
         return $balance;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function create_account($email,
                                    $name,
                                    $agent_account = null,
@@ -186,6 +201,9 @@ class MobiusTrader
         return $this->_client->call('AccountCreate', $data);
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function create_account_number($type, $account_id, $leverage, $settings_template, $display_name, $tags = array())
     {
         $data = array(
@@ -200,6 +218,9 @@ class MobiusTrader
         return $this->_client->call('AccountNumberCreate', $data);
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function password_set($account_id, $login, $password)
     {
         $result = $this->_client->call('PasswordSet', array(
@@ -212,6 +233,9 @@ class MobiusTrader
         return $result;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function password_check($login, $password)
     {
         $result = $this->_client->call('PasswordCheck', array(
@@ -264,6 +288,9 @@ class MobiusTrader
         return is_numeric($account_numbers) ? $result['data'][$account_numbers] : $result['data'];
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function balance_add($account_number_id, $amount, $comment)
     {
         $result = $this->_client->call('BalanceAdd', array(
@@ -275,6 +302,9 @@ class MobiusTrader
         return $result['status'] == self::STATUS_OK ? $result['data']['Ticket'] : false;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function bonus_add($account_number_id, $amount, $comment)
     {
         $result = $this->_client->call('BonusAdd', array(
@@ -286,6 +316,9 @@ class MobiusTrader
         return $result['status'] == self::STATUS_OK ? $result['data']['Ticket'] : false;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function credit_add($account_number_id, $amount, $comment)
     {
         $result = $this->_client->call('CreditAdd', array(
@@ -297,6 +330,9 @@ class MobiusTrader
         return $result['status'] == self::STATUS_OK ? $result['data']['Ticket'] : false;
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function order_open($account_number_id, $symbol_id, $volume, $trade_cmd, $price = 0, $sl = 0, $tp = 0, $comment = '')
     {
         return $this->_client->call('AdminOpenOrder', array(
@@ -312,10 +348,7 @@ class MobiusTrader
     }
 
     /**
-     * @param $ticket
-     * @param array $params Volume, Sl, Tp, OpenPrice, ClosePrice, Comment, UserData
-     *
-     * @return array
+     * @deprecated Use call() instead.
      */
     public function order_modify($ticket, $params = array())
     {
@@ -325,9 +358,7 @@ class MobiusTrader
     }
 
     /**
-     * @param $ticket
-     * @param array $params Volume, Price
-     * @return array
+     * @deprecated Use call() instead.
      */
     public function order_close($ticket, $params = array())
     {
@@ -337,8 +368,7 @@ class MobiusTrader
     }
 
     /**
-     * @param $ticket
-     * @return array
+     * @deprecated Use call() instead.
      */
     public function order_delete($ticket)
     {
@@ -347,6 +377,9 @@ class MobiusTrader
         ));
     }
 
+    /**
+     * @deprecated Use call() instead.
+     */
     public function get_jwt($account_id, $ip, $user_agent)
     {
         return $this->_client->call('GetJWT', array(
@@ -356,6 +389,15 @@ class MobiusTrader
         ));
     }
 
+    /**
+     * 
+     * @deprecated Use call() instead.
+     * @param type $login
+     * @param type $password
+     * @param type $ip
+     * @param type $user_gent
+     * @return type
+     */
     public function trader_auth($login, $password, $ip, $user_gent) 
     {
         return $this->_client->call('ApiTraderAuth', array(
@@ -398,23 +440,5 @@ class MobiusTrader
     public static function from_account_numbers()
     {
         return 'AccountNumbers';
-    }
-
-    private function post($url, $data = array())
-    {
-        $json_data = json_encode($data);
-
-        $opts = array('http' =>
-            array(
-                'method' => 'POST',
-                'header' => "Content-type: application/json\r\nContent-Length:" . strlen($json_data) . "\r\n",
-                'content' => $json_data
-            )
-        );
-
-        $context = stream_context_create($opts);
-        $content = file_get_contents($url, false, $context);
-
-        return json_decode($content, true);
     }
 }

@@ -10,7 +10,13 @@ $current_password = 'test222';
 $new_password = 'test111';
 
 try {
-    if (!$mt7->password_check($email, $current_password)) 
+    $result = $mt7->call('PasswordCheck', array(
+            'Login' => $email,
+            'Password' => $current_password,
+            'SessionType' => MobiusTrader::SESSION_TYPE_TRADER,
+        ));
+            
+    if ($result['status'] != MobiusTrader::STATUS_OK && $result['data'] == true) 
     {
         throw new Exception('InvalidPassword');
     }
@@ -27,7 +33,12 @@ try {
         throw new Exception('AccountNotFound');
     }
 
-    $mt7->password_set($account_id, $email, $new_password);
+    $mt7->call('PasswordSet', array(
+        'AccountId' => (int)$account_id,
+        'Login' => $email,
+        'Password' => $new_password,
+        'SessionType' => MobiusTrader::SESSION_TYPE_TRADER,
+    ));
 
     echo 'Password changed';
 } catch (Exception $e) {
