@@ -9,6 +9,16 @@ class MobiusTrader_Client
 
     public function __construct($options = array())
     {
+        if (! function_exists('base64_encode')) {
+            throw new Exception('base64_encode not supported');
+        }
+        if (! function_exists('json_encode')) {
+            throw new Exception('JSON not supported');
+        }
+        if (! function_exists('curl_init') || ! extension_loaded('curl')) {
+            throw new Exception('cURL must be installed');
+        }
+        
         $default_options = array(
             'url' => NULL,
             'user_agent' => "MobiusTrader-Client/2.0.1",
@@ -76,7 +86,7 @@ class MobiusTrader_Client
             } else if (!empty($response['error']['error'])) {
                 $data = $response['error']['error'];
             } else {
-                $data = 'Unknown error';
+                $data = json_encode($response['error']);
             }
         } else {
             $status = self::STATUS_OK;
