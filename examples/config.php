@@ -1,8 +1,7 @@
 <?php
 
 $config = array(
-    'url' => 'http://mt7.example.com:12345', // The protocol must be http, not https
-    'broker' => '',
+    'broker' => 123456,
     'password' => '',
     'cache_enabled' => true,
     'cache_path' => '/tmp/mt7.cache',

@@ -21,7 +21,7 @@ class MobiusTrader_Client
         
         $default_options = array(
             'url' => NULL,
-            'user_agent' => "MobiusTrader-Client/2.0.1",
+            'user_agent' => 'MT7-PHP/2.0.2',
             'broker' => NULL,
             'password' => NULL,
             'response' => array(
@@ -41,7 +41,7 @@ class MobiusTrader_Client
 
     public function call($method, array $params = NULL)
     {
-        $url = str_replace('https', 'http', $this->options['url']);
+        $url = 'https://api.mtrader7.com/v1';
         $payload = new stdClass;
 
         $payload->jsonrpc = '2.0';
@@ -60,8 +60,9 @@ class MobiusTrader_Client
             CURLOPT_URL => $url,
             CURLOPT_USERAGENT => $this->options['user_agent'],
             CURLOPT_POST => 1,
-            CURLOPT_SSL_VERIFYHOST => FALSE,
-            CURLOPT_SSL_VERIFYPEER => FALSE,
+            CURLOPT_SSL_VERIFYPEER => TRUE,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 20,
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Authorization: Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password'])
@@ -71,18 +72,32 @@ class MobiusTrader_Client
 
         // Send the request & save response to $resp
         $response = curl_exec($curl);
-
-        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        
+        if ($http_code !== 200) {
+            return array(
+                'status' => self::STATUS_ERROR,
+                'data' => $http_code,
+                'message' => $response,
+            ); 
+        }
 
         // Close request to clear up some resources
         curl_close($curl);
 
         $response = json_decode($response, true);
+        
+        $message = '';
+        $args = array();
 
-        if (!empty($response['error']) || $status !== 200) {
+        if (!empty($response['error'])) {
             $status = self::STATUS_ERROR;
+            
             if (!empty($response['error']['error']['Key'])) {
                 $data = $response['error']['error']['Key'];
+                $message = $response['error']['error']['Message'];
+                $args = $response['error']['error']['Args'];
             } else if (!empty($response['error']['error'])) {
                 $data = $response['error']['error'];
             } else {
@@ -95,7 +110,9 @@ class MobiusTrader_Client
 
         return array(
             'status' => $status,
-            'data' => $data
+            'data' => $data,
+            'message' => $message,
+            'args' => $args,
         );
     }
 
