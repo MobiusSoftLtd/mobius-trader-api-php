@@ -24,6 +24,7 @@ class MobiusTrader_Client
             'user_agent' => 'MT7-PHP/2.0.2',
             'broker' => NULL,
             'password' => NULL,
+            'float_mode' => false,
             'response' => array(
                 'status' => array(
                     'field' => 'status',
@@ -53,6 +54,16 @@ class MobiusTrader_Client
         }
 
         $curl = curl_init();
+        
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password']),
+        );
+        
+        if ($this->options['float_mode']) 
+        {
+            $headers[] = 'X-FloatMode: true';
+        }
 
         // Set some options - we are passing in a useragent too here
         curl_setopt_array($curl, array(
@@ -63,10 +74,7 @@ class MobiusTrader_Client
             CURLOPT_SSL_VERIFYPEER => TRUE,
             CURLOPT_CONNECTTIMEOUT => 5,
             CURLOPT_TIMEOUT => 20,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password'])
-            ),
+            CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => json_encode($payload)
         ));
 

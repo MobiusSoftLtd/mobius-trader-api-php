@@ -28,6 +28,8 @@ class MobiusTrader_Search
 
     // OFFSET ...
     protected $_offset = NULL;
+    
+    protected $_float_mode = false;
 
     protected $_result = NULL;
 
@@ -64,6 +66,13 @@ class MobiusTrader_Search
     public function offset($number)
     {
         $this->_offset = $number;
+
+        return $this;
+    }
+
+    public function float_mode($value)
+    {
+        $this->_float_mode = $value;
 
         return $this;
     }
@@ -235,7 +244,13 @@ class MobiusTrader_Search
             // Add offsets
             $query['Offset'] = $this->_offset;
         }
-
+        
+       
+        if ($this->_float_mode === true) 
+        {
+            $query['FloatMode'] = true;
+        }
+        
         $this->_query = $query;
 
         return $this;

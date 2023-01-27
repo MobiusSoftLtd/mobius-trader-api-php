@@ -29,17 +29,8 @@ $orders = $mt7->search_array(array(
     ->limit(10)
     ->offset(0)
     ->order_by('Ticket', 'DESC')
+    ->float_mode(true)
     ->execute()
     ->as_array();
-
-foreach ($orders as &$order) {
-    $symbol_id = $order['SymbolId'];
-    $currency_id = $order['AccountNumbers.CurrencyId'];
-    $order['OpenPrice'] = $mt7->price_from_int($symbol_id, $order['OpenPrice']);
-    $order['ClosePrice'] = $mt7->price_from_int($symbol_id, $order['ClosePrice']);
-    $order['Profit'] = $mt7->deposit_from_int($currency_id, $order['Profit']);
-    $order['Commission'] = $mt7->deposit_from_int($currency_id, $order['Commission']);
-    $order['Volume'] = $mt7->volume_from_int($symbol_id, $order['Volume']);
-}
 
 die(var_dump($orders));

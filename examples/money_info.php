@@ -6,6 +6,7 @@ require_once './config.php';
 $mt7 = new MobiusTrader($config);
 
 $account_number_id = 1;
+$currency = 'USD';
 
 $money_info = $mt7->call('MoneyInfo', array(
     'AccountNumbers' => array($account_number_id),
