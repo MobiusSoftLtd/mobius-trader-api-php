@@ -35,6 +35,11 @@ class MobiusTrader
         $this->_cache = new MobiusTrader_Cache($config);
         $this->_client = new MobiusTrader_Client($config);
     }
+    
+    public function is_float_mode()
+    {
+        return $this->_config['float_mode'];
+    }
 
     public function get_symbols()
     {
@@ -261,7 +266,12 @@ class MobiusTrader
 
     public function funds_deposit($currency, $account_number_id, $amount, $pay_system_code, $purse = '')
     {
-        $comment = trim(implode(' ', ['DP', $pay_system_code, $this->deposit_from_int($currency, $amount), $purse]));
+        $comment = trim(implode(' ', array(
+            'DP', 
+            $pay_system_code, 
+            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount), 
+            $purse
+        )));
         return $this->balance_add($account_number_id, $amount, $comment);
     }
 
@@ -273,7 +283,12 @@ class MobiusTrader
             throw new Exception('NotEnoughMoney');
         }
 
-        $comment = trim(implode(' ', ['WD', $pay_system_code, $this->deposit_from_int($currency, $amount), $purse]));
+        $comment = trim(implode(' ', array(
+            'WD', 
+            $pay_system_code, 
+            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount), 
+            $purse
+        )));
 
         return $this->balance_add($account_number_id, $amount, $comment);
     }
