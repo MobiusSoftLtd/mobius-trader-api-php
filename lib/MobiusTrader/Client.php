@@ -72,8 +72,8 @@ class MobiusTrader_Client
             CURLOPT_USERAGENT => $this->options['user_agent'],
             CURLOPT_POST => 1,
             CURLOPT_SSL_VERIFYPEER => TRUE,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT => 20,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => json_encode($payload)
         ));
@@ -86,8 +86,8 @@ class MobiusTrader_Client
         if ($http_code !== 200) {
             return array(
                 'status' => self::STATUS_ERROR,
-                'data' => $http_code,
-                'message' => $response,
+                'data' => $http_code ? $http_code : 'UnknownError',
+                'message' => curl_error($curl) ? curl_error($curl) : $response,
             ); 
         }
 
