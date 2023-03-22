@@ -71,9 +71,9 @@ class MobiusTrader_Client
             CURLOPT_URL => $url,
             CURLOPT_USERAGENT => $this->options['user_agent'],
             CURLOPT_POST => 1,
-            CURLOPT_SSL_VERIFYPEER => TRUE,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => FALSE,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => json_encode($payload)
         ));
