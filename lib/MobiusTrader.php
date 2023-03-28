@@ -38,7 +38,7 @@ class MobiusTrader
     
     public function is_float_mode()
     {
-        return $this->_config['float_mode'];
+        return !empty($this->_config['float_mode']) ? $this->_config['float_mode'] === true : false;
     }
 
     public function get_symbols()
