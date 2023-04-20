@@ -42,7 +42,7 @@ class MobiusTrader_Client
 
     public function call($method, array $params = NULL)
     {
-        $url = 'https://api.mtrader7.com/v1';
+        $url = 'https://mtrader7api.com/v1';
         $payload = new stdClass;
 
         $payload->jsonrpc = '2.0';
