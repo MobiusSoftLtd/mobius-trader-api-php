@@ -15,26 +15,26 @@ try {
             'Password' => $current_password,
             'SessionType' => MobiusTrader::SESSION_TYPE_TRADER,
         ));
-            
-    if ($result['status'] != MobiusTrader::STATUS_OK && $result['data'] == true) 
+
+    if ($result['status'] != MobiusTrader::STATUS_OK && $result['data'] == true)
     {
         throw new Exception('InvalidPassword');
     }
 
-    $account_id = $mt7->search('Id')
-        ->from(MobiusTrader::from_accounts())
+    $client_id = $mt7->search('Id')
+        ->from(MobiusTrader::from_clients())
         ->where('Email', '=', $email)
         ->limit(1)
         ->execute()
         ->get('Id');
 
-    if (!$account_id) 
+    if (!$client_id)
     {
-        throw new Exception('AccountNotFound');
+        throw new Exception('ClientNotFound');
     }
 
     $mt7->call('PasswordSet', array(
-        'AccountId' => (int)$account_id,
+        'ClientId' => (int)$client_id,
         'Login' => $email,
         'Password' => $new_password,
         'SessionType' => MobiusTrader::SESSION_TYPE_TRADER,

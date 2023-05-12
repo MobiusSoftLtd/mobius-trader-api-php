@@ -28,7 +28,7 @@ class MobiusTrader_Search
 
     // OFFSET ...
     protected $_offset = NULL;
-    
+
     protected $_float_mode = false;
 
     protected $_result = NULL;
@@ -244,13 +244,13 @@ class MobiusTrader_Search
             // Add offsets
             $query['Offset'] = $this->_offset;
         }
-        
-       
-        if ($this->_float_mode === true) 
+
+
+        if ($this->_float_mode === true)
         {
             $query['FloatMode'] = true;
         }
-        
+
         $this->_query = $query;
 
         return $this;
@@ -266,7 +266,7 @@ class MobiusTrader_Search
                 'OpenTime',
                 'CloseTime',
                 'TradeCmd',
-                'AccountNumberId',
+                'TradingAccountId',
                 'Sl',
                 'Tp',
                 'Volume',

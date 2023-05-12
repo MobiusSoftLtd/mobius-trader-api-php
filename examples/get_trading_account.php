@@ -5,15 +5,15 @@ require_once './config.php';
 
 $mt7 = new MobiusTrader($config);
 
-$account_id = 1;
+$trading_account_id = 1;
 
-$response = $mt7->call('AccountGet', array(
-    'Id' => $account_id
+$response = $mt7->call('TradingAccountGet', array(
+    'Id' => $trading_account_id
 ));
 
 if ($response['status'] === MobiusTrader::STATUS_OK) {
-    $account = $response['data'];
-    die(var_dump($account));
+    $trading_account = $response['data'];
+    die(var_dump($trading_account));
 } else {
     echo 'Error: ' . $response['data'];
 }

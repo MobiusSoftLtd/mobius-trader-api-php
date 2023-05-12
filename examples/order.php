@@ -5,17 +5,18 @@ require_once './config.php';
 
 $mt7 = new MobiusTrader($config);
 
-$account_number_id = 1;
+$trading_account_id = 1;
 $symbol_id = 1;
 
 $response = $mt7->call('AdminOpenOrder', array(
-    'AccountNumberId' => $account_number_id,
+    'TradingAccountId' => $trading_account_id,
     'SymbolId' => $symbol_id,
     'Volume' => $mt7->volume_to_int($symbol_id, 0.001),
     'TradeCmd' => MobiusTrader::ORDER_CMD_SELL,
 ));
 
-if ($response['status'] === MobiusTrader::STATUS_OK) {
+if ($response['status'] === MobiusTrader::STATUS_OK)
+{
     $order = $response['data'];
     $ticket = $order['Ticket'];
 

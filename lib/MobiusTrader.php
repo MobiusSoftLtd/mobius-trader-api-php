@@ -35,7 +35,7 @@ class MobiusTrader
         $this->_cache = new MobiusTrader_Cache($config);
         $this->_client = new MobiusTrader_Client($config);
     }
-    
+
     public function is_float_mode()
     {
         return !empty($this->_config['float_mode']) ? $this->_config['float_mode'] === true : false;
@@ -128,49 +128,49 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function get_account($account_id)
+    public function get_client($client_id)
     {
-        return $this->_client->call('AccountGet', array(
-            'Id' => $account_id
+        return $this->_client->call('ClientGet', array(
+            'Id' => $client_id
         ));
     }
 
     /**
      * @deprecated Use call() instead.
      */
-    public function get_account_number($account_number_id)
+    public function get_trading_account($trading_account_id)
     {
-        return $this->_client->call('AccountNumberGet', array(
-            'Id' => $account_number_id
+        return $this->_client->call('TradingAccountGet', array(
+            'Id' => $trading_account_id
         ));
     }
 
     /**
      * @deprecated Use call() instead.
      */
-    public function get_account_numbers($account_id)
+    public function get_trading_accounts($client_id)
     {
-        $result = $this->_client->call('AccountNumbersGet', array(
-            'Id' => $account_id
+        $result = $this->_client->call('TradingAccountsGet', array(
+            'Id' => $client_id
         ));
         return $result['data'];
     }
 
-    public function get_account_balance($account_id, $currency = 'USD')
+    public function get_client_balance($client_id, $currency = 'USD')
     {
-        $account_numbers = array();
-        $account_numbers_all = $this->get_account_numbers($account_id);
-        foreach ($account_numbers_all as $account_number) {
-            if ($account_number['Type'] === self::ACCOUNT_NUMBER_TYPE_REAL) {
-                $account_numbers[] = $account_number['Id'];
+        $trading_accounts = array();
+        $trading_accounts_all = $this->get_trading_accounts($client_id);
+        foreach ($trading_accounts_all as $trading_account) {
+            if ($trading_account['Type'] === self::ACCOUNT_NUMBER_TYPE_REAL) {
+                $trading_accounts[] = $trading_account['Id'];
             }
         }
 
-        $money_info = $this->money_info($account_numbers, $currency);
+        $money_info = $this->money_info($trading_accounts, $currency);
 
         $balance = 0;
-        foreach ($account_numbers as $account_number_id) {
-            $money = $money_info[$account_number_id];
+        foreach ($trading_accounts as $trading_account_id) {
+            $money = $money_info[$trading_account_id];
             $balance += $money['Free'] - $money['Credit'];
         }
         return $balance;
@@ -179,9 +179,9 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function create_account($email,
+    public function create_client($email,
                                    $name,
-                                   $agent_account = null,
+                                   $agent_client = null,
                                    $country = '',
                                    $city = '',
                                    $address = '',
@@ -193,7 +193,7 @@ class MobiusTrader
         $data = array(
             'Name' => $name,
             'Email' => $email,
-            'AgentAccount' => $agent_account,
+            'AgentClient' => $agent_client,
             'Country' => $country,
             'City' => $city,
             'Phone' => $phone,
@@ -203,16 +203,16 @@ class MobiusTrader
             'Comment' => $comment,
         );
 
-        return $this->_client->call('AccountCreate', $data);
+        return $this->_client->call('ClientCreate', $data);
     }
 
     /**
      * @deprecated Use call() instead.
      */
-    public function create_account_number($type, $account_id, $leverage, $settings_template, $display_name, $tags = array())
+    public function create_trading_account($type, $client_id, $leverage, $settings_template, $display_name, $tags = array())
     {
         $data = array(
-            'AccountId' => (int)$account_id,
+            'ClientId' => (int)$client_id,
             'Leverage' => (int)$leverage,
             'SettingsTemplate' => $settings_template,
             'DisplayName' => $display_name,
@@ -220,16 +220,16 @@ class MobiusTrader
             'Type' => $type,
         );
 
-        return $this->_client->call('AccountNumberCreate', $data);
+        return $this->_client->call('TradingAccountCreate', $data);
     }
 
     /**
      * @deprecated Use call() instead.
      */
-    public function password_set($account_id, $login, $password)
+    public function password_set($client_id, $login, $password)
     {
         $result = $this->_client->call('PasswordSet', array(
-            'AccountId' => (int)$account_id,
+            'ClientId' => (int)$client_id,
             'Login' => $login,
             'Password' => $password,
             'SessionType' => self::SESSION_TYPE,
@@ -264,52 +264,52 @@ class MobiusTrader
         return (double)($amount * pow(10, -$currency_info['DepositFractionalDigits']));
     }
 
-    public function funds_deposit($currency, $account_number_id, $amount, $pay_system_code, $purse = '')
+    public function funds_deposit($currency, $trading_account_id, $amount, $pay_system_code, $purse = '')
     {
         $comment = trim(implode(' ', array(
-            'DP', 
-            $pay_system_code, 
-            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount), 
+            'DP',
+            $pay_system_code,
+            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount),
             $purse
         )));
-        return $this->balance_add($account_number_id, $amount, $comment);
+        return $this->balance_add($trading_account_id, $amount, $comment);
     }
 
-    public function funds_withdraw($currency, $account_number_id, $amount, $pay_system_code, $purse = '')
+    public function funds_withdraw($currency, $trading_account_id, $amount, $pay_system_code, $purse = '')
     {
-        $money = $this->money_info($account_number_id);
+        $money = $this->money_info($trading_account_id);
 
         if ($money['Free'] - $money['Credit'] < $amount) {
             throw new Exception('NotEnoughMoney');
         }
 
         $comment = trim(implode(' ', array(
-            'WD', 
-            $pay_system_code, 
-            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount), 
+            'WD',
+            $pay_system_code,
+            $this->is_float_mode() ? $amount : $this->deposit_from_int($currency, $amount),
             $purse
         )));
 
-        return $this->balance_add($account_number_id, $amount, $comment);
+        return $this->balance_add($trading_account_id, $amount, $comment);
     }
 
-    public function money_info($account_numbers, $currency = '')
+    public function money_info($trading_accounts, $currency = '')
     {
         $result = $this->_client->call('MoneyInfo', array(
-            'AccountNumbers' => (array)$account_numbers,
+            'TradingAccounts' => (array)$trading_accounts,
             'Currency' => $currency,
         ));
 
-        return is_numeric($account_numbers) ? $result['data'][$account_numbers] : $result['data'];
+        return is_numeric($trading_accounts) ? $result['data'][$trading_accounts] : $result['data'];
     }
 
     /**
      * @deprecated Use call() instead.
      */
-    public function balance_add($account_number_id, $amount, $comment)
+    public function balance_add($trading_account_id, $amount, $comment)
     {
         $result = $this->_client->call('BalanceAdd', array(
-            'AccountNumberId' => $account_number_id,
+            'TradingAccountId' => $trading_account_id,
             'Amount' => $amount,
             'Comment' => $comment,
         ));
@@ -320,10 +320,10 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function bonus_add($account_number_id, $amount, $comment)
+    public function bonus_add($trading_account_id, $amount, $comment)
     {
         $result = $this->_client->call('BonusAdd', array(
-            'AccountNumberId' => $account_number_id,
+            'TradingAccountId' => $trading_account_id,
             'Amount' => $amount,
             'Comment' => $comment,
         ));
@@ -334,10 +334,10 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function credit_add($account_number_id, $amount, $comment)
+    public function credit_add($trading_account_id, $amount, $comment)
     {
         $result = $this->_client->call('CreditAdd', array(
-            'AccountNumberId' => $account_number_id,
+            'TradingAccountId' => $trading_account_id,
             'Amount' => $amount,
             'Comment' => $comment,
         ));
@@ -348,10 +348,10 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function order_open($account_number_id, $symbol_id, $volume, $trade_cmd, $price = 0, $sl = 0, $tp = 0, $comment = '')
+    public function order_open($trading_account_id, $symbol_id, $volume, $trade_cmd, $price = 0, $sl = 0, $tp = 0, $comment = '')
     {
         return $this->_client->call('AdminOpenOrder', array(
-            'AccountNumberId' => $account_number_id,
+            'TradingAccountId' => $trading_account_id,
             'SymbolId' => $symbol_id,
             'Volume' => $volume,
             'TradeCmd' => $trade_cmd,
@@ -395,17 +395,17 @@ class MobiusTrader
     /**
      * @deprecated Use call() instead.
      */
-    public function get_jwt($account_id, $ip, $user_agent)
+    public function get_jwt($client_id, $ip, $user_agent)
     {
         return $this->_client->call('GetJWT', array(
-            'AccountId' => $account_id,
+            'ClientId' => $client_id,
             'IP' => $ip,
             'UserAgent' => $user_agent,
         ));
     }
 
     /**
-     * 
+     *
      * @deprecated Use call() instead.
      * @param type $login
      * @param type $password
@@ -413,7 +413,7 @@ class MobiusTrader
      * @param type $user_gent
      * @return type
      */
-    public function trader_auth($login, $password, $ip, $user_gent) 
+    public function trader_auth($login, $password, $ip, $user_gent)
     {
         return $this->_client->call('ApiTraderAuth', array(
           'Login' => $login,
@@ -447,13 +447,13 @@ class MobiusTrader
         return 'Orders';
     }
 
-    public static function from_accounts()
+    public static function from_clients()
     {
-        return 'Accounts';
+        return 'Clients';
     }
 
-    public static function from_account_numbers()
+    public static function from_trading_accounts()
     {
-        return 'AccountNumbers';
+        return 'TradingAccounts';
     }
 }

@@ -23,9 +23,9 @@ if ($response['status'] === MobiusTrader::STATUS_OK)
 {
     var_dump($response['data']);
     $jwt = $response['data']['JWT'];
-    $accountId = $response['data']['AccountId'];
-    echo 'JWT: ' . $jwt . ' ' . 'AccountId: ' . $accountId;
-} 
+    $client_id = $response['data']['ClientId'];
+    echo 'JWT: ' . $jwt . ' ' . 'ClientId: ' . $client_id;
+}
 else
 {
     echo 'Error: ' . $response['data'];
