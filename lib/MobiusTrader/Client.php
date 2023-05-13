@@ -18,7 +18,7 @@ class MobiusTrader_Client
         if (! function_exists('curl_init') || ! extension_loaded('curl')) {
             throw new Exception('cURL must be installed');
         }
-        
+
         $default_options = array(
             'url' => NULL,
             'user_agent' => 'MT7-PHP/2.0.2',
@@ -42,7 +42,7 @@ class MobiusTrader_Client
 
     public function call($method, array $params = NULL)
     {
-        $url = 'https://mtrader7api.com/v1';
+        $url = 'https://mtrader7api.com/v2';
         $payload = new stdClass;
 
         $payload->jsonrpc = '2.0';
@@ -54,13 +54,13 @@ class MobiusTrader_Client
         }
 
         $curl = curl_init();
-        
+
         $headers = array(
             'Content-Type: application/json',
             'Authorization: Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password']),
         );
-        
-        if ($this->options['float_mode']) 
+
+        if ($this->options['float_mode'])
         {
             $headers[] = 'X-FloatMode: true';
         }
@@ -80,28 +80,28 @@ class MobiusTrader_Client
 
         // Send the request & save response to $resp
         $response = curl_exec($curl);
-        
+
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        
+
         if ($http_code !== 200) {
             return array(
                 'status' => self::STATUS_ERROR,
                 'data' => $http_code ? $http_code : 'UnknownError',
                 'message' => curl_error($curl) ? curl_error($curl) : $response,
-            ); 
+            );
         }
 
         // Close request to clear up some resources
         curl_close($curl);
 
         $response = json_decode($response, true);
-        
+
         $message = '';
         $args = array();
 
         if (!empty($response['error'])) {
             $status = self::STATUS_ERROR;
-            
+
             if (!empty($response['error']['error']['Key'])) {
                 $data = $response['error']['error']['Key'];
                 $message = $response['error']['error']['Message'];
