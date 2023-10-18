@@ -20,8 +20,9 @@ class MobiusTrader_Client
         }
 
         $default_options = array(
-            'url' => NULL,
-            'user_agent' => 'MT7-PHP/2.0.2',
+            'url' => 'https://mtrader7api.com/v2',
+            'user_agent' => 'MT7-PHP/3.0.1',
+            'token' => NULL,
             'broker' => NULL,
             'password' => NULL,
             'float_mode' => false,
@@ -42,7 +43,7 @@ class MobiusTrader_Client
 
     public function call($method, array $params = NULL)
     {
-        $url = 'https://mtrader7api.com/v2';
+        $url = $this->options['url'];
         $payload = new stdClass;
 
         $payload->jsonrpc = '2.0';
@@ -55,9 +56,13 @@ class MobiusTrader_Client
 
         $curl = curl_init();
 
+        $authorization = $this->options['token'] 
+                ? 'Bearer ' . $this->options['token'] 
+                : 'Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password']);
+        
         $headers = array(
             'Content-Type: application/json',
-            'Authorization: Basic ' . base64_encode($this->options['broker'] . ':' . $this->options['password']),
+            'Authorization: ' . $authorization,
         );
 
         if ($this->options['float_mode'])
